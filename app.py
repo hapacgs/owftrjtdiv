@@ -2,10 +2,44 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 
-# Page Configuration
-st.set_page_config(page_title="CSV Data Uploader", page_icon="📊", layout="centered")
+# --- PAGE CONFIGURATION ---
+st.set_page_config(page_title="Freight Data Pro", page_icon="🚀", layout="centered")
 
-# MongoDB Connection
+# --- CUSTOM CSS FOR GLOWING UI ---
+st.markdown("""
+    <style>
+    /* Main Background */
+    .stApp {
+        background-color: #0e1117;
+        color: #ffffff;
+    }
+    /* Buttons with Glow */
+    div.stButton > button {
+        background-color: #00ffcc !important;
+        color: #000000 !important;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 24px;
+        box-shadow: 0 0 15px #00ffcc80;
+        transition: 0.3s;
+    }
+    div.stButton > button:hover {
+        box-shadow: 0 0 25px #00ffcc;
+        transform: scale(1.02);
+    }
+    /* File Uploader Customization */
+    .stFileUploader {
+        border: 2px dashed #444;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    /* Subheaders */
+    h1, h2, h3 { color: #00ffcc !important; }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- MONGODB CONNECTION ---
 MONGO_URI = st.secrets["MONGO_URI"]
 
 @st.cache_resource
@@ -16,12 +50,12 @@ def get_db_connection():
 db = get_db_connection()
 collection = db['owdata_csv_file']
 
-# UI - Title and Description
-st.title("📊 Upload Outward Freight Data CSV File Here ...")
-st.markdown("Downloaded from FOIS Webportal Data to be paste here for cleaning and saving in MongoDB Database")
+# --- APP LAYOUT ---
+st.title("🚀 Outward Freight Pro")
+st.markdown("Professional data pipeline for FOIS portal exports.")
+st.divider()
 
-# File Uploader
-uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+uploaded_file = st.file_uploader("Upload your FOIS CSV file", type="csv")
 
 if uploaded_file is not None:
     try:
@@ -33,15 +67,17 @@ if uploaded_file is not None:
         df = df[~df.astype(str).apply(lambda x: x.str.contains('TOTAL|GRAND TOTAL', case=False, na=False)).any(axis=1)]
         df = df[df['DVSN'].notna()]
         df = df.drop_duplicates()
-        # ----------------------
 
         st.subheader("Data Preview")
-        st.write(f"Cleaned rows: **{len(df)}**")
+        # Creating a metric for visibility
+        col1, col2 = st.columns([1, 2])
+        col1.metric("Cleaned Rows", len(df))
+        
         st.dataframe(df.head(10), use_container_width=True)
 
         if st.button("Save to Database"):
             if not df.empty:
-                with st.spinner('Checking for duplicates and saving...'):
+                with st.spinner('Syncing to Cloud...'):
                     # Duplicate check based on RR NUMBER
                     rr_numbers = df['RR NUMBER'].tolist()
                     existing_docs = collection.find({"RR NUMBER": {"$in": rr_numbers}}, {"RR NUMBER": 1})
@@ -51,14 +87,13 @@ if uploaded_file is not None:
                     
                     if not new_data.empty:
                         collection.insert_many(new_data.to_dict("records"))
-                        st.success(f"Successfully saved {len(new_data)} new records!")
-                        
+                        st.success(f"Success! {len(new_data)} new records added.")
                         if len(df) > len(new_data):
-                            st.warning(f"{len(df) - len(new_data)} records were duplicates and skipped.")
+                            st.warning(f"{len(df) - len(new_data)} duplicates were ignored.")
                     else:
-                        st.info("All records in this file already exist in the database.")
+                        st.info("No new data to upload. All records already exist.")
             else:
-                st.error("The processed data is empty!")
+                st.error("The processed data resulted in an empty set.")
 
     except Exception as e:
-        st.error(f"Error processing file: {e}")
+        st.error(f"Processing Error: {e}")
