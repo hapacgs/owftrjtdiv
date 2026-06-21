@@ -6,7 +6,7 @@ from pymongo import MongoClient
 st.set_page_config(
     page_title="Outward Freight Data", 
     page_icon="🚢", 
-    layout="wide"  # Changed to wide for a dashboard feel
+    layout="wide"
 )
 
 # --- PROFESSIONAL STYLING (CSS) ---
@@ -18,6 +18,13 @@ st.markdown("""
     /* Typography */
     h1 { color: #00e5ff !important; font-weight: 800 !important; }
     h3 { color: #818cf8 !important; }
+    
+    /* Cyan label for File Uploader */
+    .stFileUploader label {
+        color: #00e5ff !important;
+        font-weight: bold !important;
+        font-size: 1.1rem !important;
+    }
     
     /* Custom Glow Buttons */
     div.stButton > button {
@@ -55,7 +62,6 @@ db = get_db_connection()
 collection = db['owdata_csv_file']
 
 # --- APP LAYOUT ---
-# Header Section
 st.title("Outward Freight Data - Rajkot Division")
 st.markdown("### Upload File Here to Clean It's Data & Save in Database...")
 
