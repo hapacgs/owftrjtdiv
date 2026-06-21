@@ -56,9 +56,8 @@ collection = db['owdata_csv_file']
 
 # --- APP LAYOUT ---
 # Header Section
-st.title("🚢 Outward Freight Pro")
-st.markdown("### Secure Data Pipeline | FOIS Portal Integration")
-st.info("Upload your cleaned CSV to sync records directly to the Cloud Database.")
+st.title("Outward Freight Data - Rajkot Division")
+st.markdown("### Upload File Here to Clean It's Data & Save in Database...")
 
 # Upload Area
 uploaded_file = st.file_uploader("Drop your CSV file here", type="csv")
