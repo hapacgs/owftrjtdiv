@@ -60,7 +60,7 @@ st.title("Outward Freight Data - Rajkot Division")
 st.markdown("### Upload File Here to Clean It's Data & Save in Database...")
 
 # Upload Area
-uploaded_file = st.file_uploader("Drop your CSV file here", type="csv")
+uploaded_file = st.file_uploader("Choose File", type="csv")
 
 if uploaded_file is not None:
     try:
