@@ -17,8 +17,8 @@ db = get_db_connection()
 collection = db['owdata_csv_file']
 
 # UI - Title and Description
-st.title("📊 CSV Data Cleaner & Uploader")
-st.markdown("Upload your CSV file, clean it, and sync it with the MongoDB database.")
+st.title("📊 Upload Outward Freight Data CSV File Here ...")
+st.markdown("Downloaded from FOIS Webportal Data to be paste here for cleaning and saving in MongoDB Database")
 
 # File Uploader
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
